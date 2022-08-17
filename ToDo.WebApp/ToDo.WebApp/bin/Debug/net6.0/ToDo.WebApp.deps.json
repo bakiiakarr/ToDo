@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "ToDo.WebApp/1.0.0": {
+        "runtime": {
+          "ToDo.WebApp.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ToDo.WebApp/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

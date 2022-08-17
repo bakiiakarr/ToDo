@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Pages\Components\ToDo.razor" />
+    <Content Remove="Pages\ToDo.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Pages\Components\ToDo.razor" />
+  </ItemGroup>
+
+</Project>

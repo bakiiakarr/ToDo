@@ -1,0 +1,57 @@
+﻿@page "/todo"
+@using ToDo.WebApp.Data.Models
+<h3>ToDo</h3>
+<!...Edit Form.../>
+<EditForm model="task" OnValidSubmit="AddTask">
+    <input type="text" @bind-value="task.TaskName"  />
+    <button>Add Task</button>
+
+</EditForm>
+
+<div class="progress-bar my-2 mx-2  " role="progressbar" style="width:@(Percentagecompleted)%" aria-valuemax="100" aria-valuemin="0"  >
+
+    @(Percentagecompleted)%  
+
+</div>
+
+
+<ul class="list-group my-2">
+    @foreach (var taskitem in taskList)
+    {
+        if(taskitem.IsComplete)
+        {
+            <!...Task Completed.../>
+            <li class="list-group-item list-group-item-succes mx-1" onclick="(()=> taskitem.IsComplete = !taskitem.IsComplete)" ><del>@taskitem.TaskName</del></li>
+        }
+                else
+                {
+                    <!...Task Not Completed.../>
+                    <li class=" list-group-item list-group-item-secondary mx-1" >@taskitem.TaskName</li>
+                }
+            
+
+    }
+
+
+
+
+</ul>
+
+
+                @code {
+                protected List<TaskModel> taskList = new List<TaskModel>();
+            protected TaskModel task = new TaskModel();
+
+            private void AddTask()
+            {
+                taskList.Add(task);
+                task = new TaskModel();
+            }
+            public int Percentagecompleted {get{
+                return taskList.Count > 0 ? (taskList.Count(x=> x.IsComplete)*100/taskList.Count): 0;
+            }}
+            
+
+
+   
+                }   
