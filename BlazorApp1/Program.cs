@@ -1,19 +1,39 @@
 using BlazorApp1.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using BlazorApp1.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Syncfusion.Blazor;
+using System;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSyncfusionBlazor(options => { options.IgnoreScriptIsolation = true; });
+
 builder.Services.AddRazorPages();
-IServerSideBlazorBuilder serverSideBlazorBuilder = builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddServerSideBlazor();
+
 //sql Database conneciton
-var SqlConnectionconfiguration = new SqlConnectionConfiguration(Configuration.GetConnecitonString("sqlDBcontext"));
+//var SqlConnectionConfiguration = new SqlConnectionConfiguration(Configuration.GetConnectionString("sqlDBcontext"));
+//services.AddSingleton(SqlConnectionConfiguration);
+
+
+builder.Services.AddScoped<ListDataAccesLayer>();
+//var test = Configuration.GetConnectionString("DataSource=.;Database=BAKAR;Integrated Security=True");
+
+//builder.Services.AddDbContext<ListDataAccesLayer>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'RazorPagesMovieContext' not found.")));
+
+builder.Services.AddDbContext<ListDataAccesLayer>(option =>
+              option.UseSqlServer("DataSource=BAKAR;Database=toDoList;Integrated Security=True"));
+//builder.Services.AddDbContext<ListDataAccesLayer>(option =>
+//              option.UseSqlServer(builder.Configuration.GetConnectionString("sqlDBcontext")));
 
 var app = builder.Build();
 
+ 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

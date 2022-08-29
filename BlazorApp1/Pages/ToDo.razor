@@ -1,33 +1,182 @@
 ﻿@page "/todo"
+@using BlazorApp1.Shared.Models
+
 
 <PageTitle>Todo</PageTitle>
-
-<h1>Todo (@todos.Count(todo => !todo.IsDone))</h1>
+<table></table>
+<h1>Todo (@xnxToDo.Count(todo => !todo.ısEnabled))</h1>
 
 <ul>
-    @foreach (var todo in todos)
+    @foreach (var todo in xnxToDo)
     {
         <li>
-            <input type="checkbox" @bind="todo.IsDone" />
-            <input @bind="todo.Title" />
+            <input type="checkbox" @bind="todo.ısEnabled" />
+            <input @bind="todo.text"/>
+            <button @onclick="(()=>DeleteToDo(todo))">Delete</button>
+
         </li>
     }
 </ul>
-
 <input placeholder="Something todo" @bind="newTodo" />
+
+<div class="control_wrapper">
+
+
+    <SfComboBox TValue="string" TItem="list" PopupHeight="250px" PopupWidth="250px"
+                Placeholder="Select a list" DataSource="@xnx"
+                @bind-Index="@ddlIndex">
+        <ComboBoxFieldSettings Value="listId" Text="listName"></ComboBoxFieldSettings>
+    </SfComboBox>
+    <SfDialog Target="#target" Width="300px" ShowCloseIcon="true" @bind-Visible="Visibility" AllowPrerender="true" IsModal="true">
+        <DialogTemplates>
+            <Header> Bilgilendirme </Header>
+            <Content> Sayfa başarıyla yüklendi ! </Content>
+        </DialogTemplates>
+    </SfDialog>
+    <SfDialog Target="#target" Width="300px" ShowCloseIcon="true" @bind-Visible="VisibilityAdd" AllowPrerender="true" IsModal="true">
+        <DialogTemplates>
+            <Header> Bilgilendirme </Header>
+            <Content> Ekleme Başarılı </Content>
+        </DialogTemplates>
+    </SfDialog>
+    <SfDialog Target="#target" Width="300px" ShowCloseIcon="true" @bind-Visible="VisibilityDelete" AllowPrerender="true" IsModal="true">
+        <DialogTemplates>
+            <Header> Bilgilendirme </Header>
+            <Content> Silme Başarılı </Content>
+        </DialogTemplates>
+    </SfDialog>
+
+</div>
+
 <button @onclick="AddTodo">Add todo</button>
+@*<button @onclick="@(()=>NavigateTo("/counter"))" ">Apair todo list</button>*@
+
+<div style="width:700px">
+    @{
+        var SearchTool = new List<string>() { "Search" };
+    }
+
+
+</div>
+<style>
+    .control_wrapper {
+        width: 250px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+</style>
 
 @code {
+
     private List<TodoItem> todos = new();
     private string? newTodo;
+    private bool isChecked = true;
+    private int? ddlIndex { get; set; }
+    private bool Visibility { get; set; } = true;
+    private bool VisibilityAdd { get; set; } = false;
+    private bool VisibilityDelete { get; set; } = false;
 
 
-    private void AddTodo()
+    toDoList a = new toDoList();
+    List<list> xnx = new List<list>();
+    List<toDoList> xnxToDo = new List<toDoList>();
+
+    ListDataAccesLayer listDataService = new ListDataAccesLayer();
+
+
+    private async void deneme()
+    {
+        ListDataAccesLayer lsal = new ListDataAccesLayer();
+        var list = await lsal.GetListAsync();
+        foreach (var item in list)
+        {
+            xnx.Add(new list() { listId = item.listId, listName = item.listName });
+
+        }
+
+    }
+    private async void deneme1()
+    {
+        ListDataAccesLayer lsal1 = new ListDataAccesLayer();
+
+        var toDoList = await lsal1.GetToDoListAsync();
+        foreach (var item in toDoList)
+        {
+            xnxToDo.Add(new toDoList() { ıd = item.ıd, text = item.text, ısEnabled = item.ısEnabled, listId = item.listId });
+        }
+
+    }
+
+    protected override void OnInitialized() // = On Page Load
+    {
+        //deneme();
+        //deneme1();
+    }
+
+
+
+    Task SomeStartupTask()
+    {
+        deneme1();
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        deneme();
+        await SomeStartupTask();
+    }
+
+    //private async void GetList(ChangeEventArgs<string, list> args)
+    //{
+
+    //    a.ListId = args.Value.Length;
+    //}
+
+    private async void AddTodo()
     {
         if (!string.IsNullOrWhiteSpace(newTodo))
         {
-            todos.Add(new TodoItem { Title = newTodo });
+            ListDataAccesLayer listDataService = new ListDataAccesLayer();
+
+            a.text = newTodo;
+            a.listId = ddlIndex + 1;
+            Console.WriteLine(a.text);
+            await listDataService.AddListAsync(a);
+            VisibilityAdd = true;
+            //var b = await listDataService.GetListAsync();
+            //Console.WriteLine();
+            xnxToDo.Clear();
             newTodo = string.Empty;
+            ddlIndex = null;
+            deneme1();
+
         }
+        //if (!string.IsNullOrWhiteSpace(newTodo))
+        //{
+        //    todos.Add(new TodoItem { Title = newTodo });
+        //    newTodo = string.Empty;
+
+        //}
     }
-}
+    private async void DeleteToDo(toDoList todo)
+    {
+        ListDataAccesLayer listDataService = new ListDataAccesLayer();
+        await listDataService.RemoveToDoAsync(todo.ıd);
+        VisibilityDelete = true;
+        //var b = await listDataService.GetListAsync();
+            //Console.WriteLine();
+            xnxToDo.Clear();
+            newTodo = string.Empty;
+            ddlIndex = null;
+            deneme1();
+
+        }
+        //if (!string.IsNullOrWhiteSpace(newTodo))
+        //{
+        //    todos.Add(new TodoItem { Title = newTodo });
+        //    newTodo = string.Empty;
+
+        //}
+    }
+
